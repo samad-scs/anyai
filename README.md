@@ -10,7 +10,7 @@ A provider-agnostic AI runtime for Node.js. Switch providers by configuration, n
 npm install anyai
 ```
 
-Install the provider SDK you need:
+Install the provider SDK you need (optional):
 
 ```bash
 # For Gemini
@@ -19,6 +19,8 @@ npm install @google/generative-ai
 # For OpenAI
 npm install openai
 ```
+
+**Note**: `anyai` uses a [tree-shakeable architecture](./docs/architecture.md#tree-shaking). You only need to install the SDKs for the providers you actually use. Unused providers will not be included in your final bundle.
 
 ## Quick Start
 

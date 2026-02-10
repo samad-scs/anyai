@@ -8,15 +8,13 @@ import type {
 import { AnyAIProviderError } from "../../core/errors.js";
 
 export class OpenAIAdapter implements ChatAdapter {
-  private apiKey: string;
+  private client: Promise<InstanceType<typeof import("openai").default>>;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(private apiKey: string) {
+    this.client = this.initClient();
   }
 
-  private async getClient(): Promise<
-    InstanceType<typeof import("openai").default>
-  > {
+  private async initClient() {
     try {
       const { default: OpenAI } = await import("openai");
       return new OpenAI({ apiKey: this.apiKey });
@@ -31,7 +29,7 @@ export class OpenAIAdapter implements ChatAdapter {
 
   async send(messages: ChatMessage[], model: string): Promise<ChatResponse> {
     try {
-      const client = await this.getClient();
+      const client = await this.client;
 
       const result = await client.chat.completions.create({
         model,
@@ -74,7 +72,7 @@ export class OpenAIAdapter implements ChatAdapter {
     model: string,
   ): AsyncIterable<ChatStreamChunk> {
     try {
-      const client = await this.getClient();
+      const client = await this.client;
 
       const stream = await client.chat.completions.create({
         model,
