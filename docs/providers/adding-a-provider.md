@@ -105,4 +105,4 @@ anthropic: async () => {
 ```
 
 3.  Add the SDK to `optionalDependencies` in `package.json`.
-4.  Update `docs/README.md` supported providers table.
+4.  Update the root `README.md` file to include the new provider in the "Supported Providers" table. Follow the `provider-listing` skill instructions.
