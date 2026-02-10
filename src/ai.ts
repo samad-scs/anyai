@@ -23,27 +23,31 @@ export class AI<P extends ProviderName = ProviderName> {
   private static async loadAdapter<P extends ProviderName>(
     config: AIConfig<P>,
   ): Promise<ChatAdapter> {
-    switch (config.provider) {
-      case "gemini": {
+    // ** Provider Registry for Lazy Loading
+    const providerLoaders: Record<
+      ProviderName,
+      () => Promise<new (apiKey: string) => ChatAdapter>
+    > = {
+      gemini: async () => {
         const { GeminiAdapter } = await import("./providers/gemini/adapter.js");
-        return new GeminiAdapter(config.apiKey);
-      }
-
-      case "openai": {
+        return GeminiAdapter;
+      },
+      openai: async () => {
         const { OpenAIAdapter } = await import("./providers/openai/adapter.js");
-        return new OpenAIAdapter(config.apiKey);
-      }
-
-      case "anthropic": {
+        return OpenAIAdapter;
+      },
+      anthropic: async () => {
         throw new AnyAIConfigError("Anthropic adapter not implemented yet.");
-      }
+      },
+    };
 
-      default: {
-        const exhaustive = config.provider as never;
-        throw new AnyAIConfigError(
-          `Unsupported provider: ${exhaustive as string}`,
-        );
-      }
+    const loader = providerLoaders[config.provider];
+
+    if (!loader) {
+      throw new AnyAIConfigError(`Unsupported provider: ${config.provider}`);
     }
+
+    const AdapterClass = await loader();
+    return new AdapterClass(config.apiKey);
   }
 }

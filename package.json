@@ -25,24 +25,13 @@
     "test:watch": "vitest",
     "test:smoke": "vitest run -t smoke"
   },
-  "peerDependencies": {
-    "@google/generative-ai": "^0.11.0",
-    "openai": "^4.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@google/generative-ai": {
-      "optional": true
-    },
-    "openai": {
-      "optional": true
-    }
-  },
   "devDependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@types/node": "^25.2.2",
-    "openai": "^4.104.0",
     "typescript": "^5.4.0",
     "vitest": "^4.0.18"
+  },
+  "optionalDependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "openai": "^4.104.0"
   },
   "engines": {
     "node": ">=18"
