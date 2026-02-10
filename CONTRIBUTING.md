@@ -18,15 +18,15 @@ Specifically:
 ## Development Setup
 
 ```bash
-pnpm install
-pnpm test
+npm install
+npm run test
 ```
 
 ## Pull Request Process
 
 1.  Create a feature branch.
-2.  Ensure strict type checking passes (`pnpm build`).
-3.  Ensure all tests pass (`pnpm test`).
+2.  Ensure strict type checking passes (`npm run build`).
+3.  Ensure all tests pass (`npm run test`).
 4.  Update documentation if public API changes.
 
 ## License

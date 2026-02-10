@@ -26,7 +26,7 @@ describe("Dependency isolation", () => {
   });
 
   it("capabilities module can be imported without provider SDKs", async () => {
-    const chat = await import("../../src/chat/index.js");
+    const chat = await import("../../src/capabilities/chat.js");
 
     expect(chat.ChatCapability).toBeDefined();
   });
@@ -40,7 +40,7 @@ describe("Dependency isolation", () => {
   });
 
   it("provider adapter types can be imported without provider SDKs", async () => {
-    const providerTypes = await import("../../src/adapters/types.js");
+    const providerTypes = await import("../../src/providers/types.js");
 
     // This is a types-only module, import should not throw
     expect(providerTypes).toBeDefined();

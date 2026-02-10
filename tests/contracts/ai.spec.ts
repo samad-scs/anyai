@@ -1,12 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { AI } from "../../src/index.js";
-import { ChatCapability } from "../../src/chat/index.js";
+import { ChatCapability } from "../../src/capabilities/chat.js";
 
 describe("AI Contract", () => {
   it("should expose chat capability", async () => {
-    // Mocking standard import to not fail on missing keys/providers
-    // But AI.create validates provider first.
-    // We can test that AI class structure is correct.
     expect(AI).toBeDefined();
     expect(AI.create).toBeDefined();
   });
@@ -24,10 +21,16 @@ describe("AI Contract", () => {
 
 describe("Chat Capability", () => {
   it("should have send and stream methods", () => {
+    // We use a cast here because we don't want to create a full mock adapter for this simple check
+    // and we are just checking the class definition prototype or instantiation
     const mockAdapter = {
-      send: vi.fn(),
-      stream: vi.fn(),
-    };
+      send: () =>
+        Promise.resolve({
+          message: { role: "assistant", content: "test" },
+        } as any),
+      stream: () => (async function* () {})(),
+    } as any;
+
     const chat = new ChatCapability(mockAdapter, "model");
     expect(chat.send).toBeDefined();
     expect(chat.stream).toBeDefined();

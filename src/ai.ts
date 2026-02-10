@@ -1,10 +1,10 @@
 // ** Application Service, Constants, and Type Imports
 import type { AIConfig, ProviderName } from "./core/types.js";
-import type { ChatAdapter } from "./adapters/types.js";
+import type { ChatAdapter } from "./providers/types.js";
 import { AnyAIConfigError } from "./core/errors.js";
 
 // ** Custom Component Imports
-import { ChatCapability } from "./chat/index.js";
+import { ChatCapability } from "./capabilities/chat.js";
 
 export class AI<P extends ProviderName = ProviderName> {
   public readonly chat: ChatCapability;
@@ -25,12 +25,12 @@ export class AI<P extends ProviderName = ProviderName> {
   ): Promise<ChatAdapter> {
     switch (config.provider) {
       case "gemini": {
-        const { GeminiAdapter } = await import("./adapters/gemini/adapter.js");
+        const { GeminiAdapter } = await import("./providers/gemini/adapter.js");
         return new GeminiAdapter(config.apiKey);
       }
 
       case "openai": {
-        const { OpenAIAdapter } = await import("./adapters/openai/adapter.js");
+        const { OpenAIAdapter } = await import("./providers/openai/adapter.js");
         return new OpenAIAdapter(config.apiKey);
       }
 

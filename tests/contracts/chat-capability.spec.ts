@@ -12,10 +12,10 @@ import type {
   ChatResponse,
   ChatStreamChunk,
 } from "../../src/core/types.js";
-import type { ChatAdapter } from "../../src/adapters/types.js";
+import type { ChatAdapter } from "../../src/providers/types.js";
 
 // ** Custom Component Imports
-import { ChatCapability } from "../../src/chat/index.js";
+import { ChatCapability } from "../../src/capabilities/chat.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

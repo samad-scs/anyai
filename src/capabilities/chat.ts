@@ -4,7 +4,7 @@ import type {
   ChatResponse,
   ChatStreamChunk,
 } from "../core/types.js";
-import type { ChatAdapter } from "../adapters/types.js";
+import type { ChatAdapter } from "../providers/types.js";
 
 export class ChatCapability {
   constructor(

@@ -12,7 +12,7 @@ import type {
   ChatResponse,
   ChatStreamChunk,
 } from "../../src/core/types.js";
-import type { ChatAdapter } from "../../src/adapters/types.js";
+import type { ChatAdapter } from "../../src/providers/types.js";
 
 // ─── Reusable contract runner ────────────────────────────────────────────────
 
