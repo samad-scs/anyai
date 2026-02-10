@@ -10,17 +10,13 @@ A provider-agnostic AI runtime for Node.js. Switch providers by configuration, n
 npm install anyai
 ```
 
-Install the provider SDK you need (optional):
+That's it. You don't need to install individual provider SDKs like `@google/generative-ai` or `openai` separately. `anyai` manages these dependencies internally.
 
-```bash
-# For Gemini
-npm install @google/generative-ai
+## Tree-Shaking Architecture
 
-# For OpenAI
-npm install openai
-```
+The package is built with a tree-shakeable architecture. Despite having multiple provider SDKs as optional dependencies, your final application bundle will only include the code for the providers you actually initialize.
 
-**Note**: `anyai` uses a [tree-shakeable architecture](./docs/architecture.md#tree-shaking). You only need to install the SDKs for the providers you actually use. Unused providers will not be included in your final bundle.
+If you only use Gemini, the OpenAI and Anthropic logic will be automatically excluded from your production build.
 
 ## Quick Start
 
@@ -30,7 +26,7 @@ import { AI } from "anyai";
 const ai = await AI.create({
   provider: "gemini",
   apiKey: process.env.GEMINI_API_KEY!,
-  model: "gemini-2.5-flash", // ← fully type-safe, autocompletes Gemini models only
+  model: "gemini-2.0-flash", // Fully type-safe, autocompletes Gemini models
 });
 
 const response = await ai.chat.send({
@@ -42,21 +38,29 @@ console.log(response.message.content);
 
 ## Type-Safe Provider Models
 
-When you set `provider`, the `model` field is constrained to only that provider's models:
+When you set the `provider`, the `model` field is strictly constrained to that provider's models:
 
 ```ts
-// ✅ Type-safe — only Gemini models allowed
+// Valid: only Gemini models are suggested and allowed
 await AI.create({
   provider: "gemini",
-  model: "gemini-2.5-flash",
+  model: "gemini-2.0-flash",
   apiKey: "...",
 });
 
-// ✅ Type-safe — only OpenAI models allowed
-await AI.create({ provider: "openai", model: "gpt-4o", apiKey: "..." });
+// Valid: only OpenAI models are suggested and allowed
+await AI.create({
+  provider: "openai",
+  model: "gpt-4o",
+  apiKey: "...",
+});
 
-// ❌ Type error — "gpt-4o" is not a Gemini model
-await AI.create({ provider: "gemini", model: "gpt-4o", apiKey: "..." });
+// Error: "gpt-4o" is not a Gemini model
+await AI.create({
+  provider: "gemini",
+  model: "gpt-4o",
+  apiKey: "...",
+});
 ```
 
 ## Streaming
@@ -75,13 +79,15 @@ for await (const chunk of stream) {
 
 ## Supported Providers
 
-| Provider  | `send()` | `stream()` | SDK                     |
-| --------- | -------- | ---------- | ----------------------- |
-| Gemini    | ✅       | ✅         | `@google/generative-ai` |
-| OpenAI    | ✅       | ✅         | `openai`                |
-| Anthropic | 🔜       | 🔜         | —                       |
+| Provider  | Status      | Capabilities    |
+| --------- | ----------- | --------------- |
+| Gemini    | Available   | Chat, Streaming |
+| OpenAI    | Available   | Chat, Streaming |
+| Anthropic | Coming Soon | —               |
 
 ## Error Handling
+
+Standardized error types across all providers:
 
 ```ts
 import { AnyAIProviderError, AnyAIConfigError } from "anyai";
@@ -90,16 +96,16 @@ try {
   await ai.chat.send({ messages: [{ role: "user", content: "Hello" }] });
 } catch (error) {
   if (error instanceof AnyAIProviderError) {
-    console.error(`Provider ${error.provider} failed:`, error.message);
+    console.error(`Provider ${error.provider} failed: ${error.message}`);
   }
 }
 ```
 
 ## Non-Goals
 
-This is infrastructure, not product logic. anyai does **not** provide:
+To keep the core runtime lean and fast, `anyai` explicitly avoids:
 
-- Utility functions or helpers
-- Provider shortcuts (`ai.gemini()`)
-- Middleware or plugins
-- Multimodal, images, tools, or embeddings (v1)
+- Adding product-level utility functions or helpers.
+- Implicit provider shortcuts like `ai.gemini()`.
+- Middleware or plugin systems.
+- Multimodal features (images, audio) in the v1 core.
