@@ -2,6 +2,22 @@
   "name": "anyai",
   "version": "0.1.0",
   "description": "One API. Any AI provider.",
+  "homepage": "https://github.com/samad-ai/anyai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samad-ai/anyai.git"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "openai",
+    "gemini",
+    "anthropic",
+    "ai-runtime",
+    "provider-agnostic",
+    "sdk"
+  ],
+  "author": "Samad Saiyed",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -14,7 +30,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
