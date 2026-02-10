@@ -7,9 +7,9 @@
 ```mermaid
 graph TD
     App[Your Application] --> Core[anyai Core]
-    Core --> Capabilities[Capabilities (Chat, etc.)]
+    Core --> Capabilities["Capabilities (Chat, etc.)"]
     Capabilities --> Adapter[Provider Adapter]
-    Adapter -.-> SDK[Provider SDK (Optional)]
+    Adapter -.-> SDK["Provider SDK (Optional)"]
     SDK -.-> API[Provider API]
 ```
 
