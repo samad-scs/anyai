@@ -18,26 +18,24 @@ describe("Provider lazy loading", () => {
     expect(typeof AI.create).toBe("function");
   });
 
-  it("AI.create with anthropic throws config error (not SDK error)", async () => {
+  it("AI.create with anthropic only loads anthropic SDK", async () => {
     const { AI } = await import("../../src/ai.js");
 
-    // Anthropic is declared but not implemented yet
-    // This should throw AnyAIConfigError, NOT an SDK missing error
+    // This will try to load @anthropic-ai/sdk
+    // Since it IS installed as a devDependency, it should succeed
     await expect(
       AI.create({
         provider: "anthropic",
         apiKey: "test-key",
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5",
       }),
-    ).rejects.toThrow(AnyAIConfigError);
+    ).resolves.toBeDefined();
   });
 
   it("AI.create with gemini only loads gemini SDK", async () => {
     const { AI } = await import("../../src/ai.js");
 
-    // This will try to load @google/generative-ai
-    // Since it IS installed as a devDependency, it should succeed
-    // The key point: openai SDK is NOT loaded
+    // This will try to load @google/genai
     try {
       await AI.create({
         provider: "gemini",

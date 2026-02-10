@@ -1,6 +1,6 @@
 {
   "name": "anyai",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "One API. Any AI provider.",
   "homepage": "https://github.com/samad-ai/anyai",
   "repository": {
@@ -48,7 +48,8 @@
     "vitest": "^4.0.18"
   },
   "optionalDependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@anthropic-ai/sdk": "^0.74.0",
+    "@google/genai": "^1.40.0",
     "openai": "^4.104.0"
   },
   "engines": {

@@ -102,4 +102,4 @@ Any feature or task in this repository MUST adhere to the following skill workfl
 ## Related Resources
 
 - `docs/AGENT.md`: Full project documentation.
-- `docs/README.md`: Quick start and usage examples.
+- `README.md`: Quick start and usage examples.

@@ -37,7 +37,9 @@ export class AI<P extends ProviderName = ProviderName> {
         return OpenAIAdapter;
       },
       anthropic: async () => {
-        throw new AnyAIConfigError("Anthropic adapter not implemented yet.");
+        const { AnthropicAdapter } =
+          await import("./providers/anthropic/adapter.js");
+        return AnthropicAdapter;
       },
     };
 

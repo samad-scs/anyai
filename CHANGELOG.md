@@ -3,6 +3,17 @@
 All notable changes to this project are documented here.
 This project follows Semantic Versioning.
 
+## [0.2.0] – 2026-02-10
+
+### Added
+
+- Anthropic provider support (`@anthropic-ai/sdk`).
+- `AnthropicAdapter` implementation.
+
+### Changed
+
+- Migrated Gemini provider from `@google/generative-ai` to `@google/genai`.
+
 ## [0.1.1] – 2026-02-10
 
 ### Changed

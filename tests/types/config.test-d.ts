@@ -33,8 +33,7 @@ function testProviderName() {
 function testProviderModelMap() {
   const geminiModel: ProviderModelMap["gemini"] = "gemini-2.5-pro";
   const openaiModel: ProviderModelMap["openai"] = "gpt-4o";
-  const anthropicModel: ProviderModelMap["anthropic"] =
-    "claude-sonnet-4-20250514";
+  const anthropicModel: ProviderModelMap["anthropic"] = "claude-sonnet-4-5";
 
   // @ts-expect-error — wrong model for gemini
   const badGemini: ProviderModelMap["gemini"] = "gpt-4o";
@@ -54,12 +53,12 @@ function testModelEnums() {
   // OpenAI models
   const o1: OpenAIModel = "gpt-4.1";
   const o2: OpenAIModel = "gpt-4o";
-  const o3: OpenAIModel = "o3";
-  const o4: OpenAIModel = "o4-mini";
+  const o3: OpenAIModel = "gpt-5";
+  const o4: OpenAIModel = "gpt-4.1-mini";
 
   // Anthropic models
-  const a1: AnthropicModel = "claude-sonnet-4-20250514";
-  const a2: AnthropicModel = "claude-3.5-sonnet-20241022";
+  const a1: AnthropicModel = "claude-sonnet-4-5";
+  const a2: AnthropicModel = "claude-haiku-4-5-20251001";
 
   // @ts-expect-error — nonexistent model
   const bad: GeminiModel = "gemini-99";

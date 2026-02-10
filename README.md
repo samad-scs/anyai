@@ -79,11 +79,11 @@ for await (const chunk of stream) {
 
 ## Supported Providers
 
-| Provider  | Status      | Capabilities    |
-| --------- | ----------- | --------------- |
-| Gemini    | Available   | Chat, Streaming |
-| OpenAI    | Available   | Chat, Streaming |
-| Anthropic | Coming Soon | —               |
+| Provider  | Status    | Capabilities    |
+| --------- | --------- | --------------- |
+| Gemini    | Available | Chat, Streaming |
+| OpenAI    | Available | Chat, Streaming |
+| Anthropic | Available | Chat, Streaming |
 
 ## Error Handling
 

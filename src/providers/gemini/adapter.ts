@@ -1,14 +1,14 @@
 // ** Application Service, Constants, and Type Imports
-import type { ChatAdapter } from "../types.js";
+import { AnyAIProviderError } from "../../core/errors.js";
 import type {
   ChatMessage,
   ChatResponse,
   ChatStreamChunk,
 } from "../../core/types.js";
-import { AnyAIProviderError } from "../../core/errors.js";
+import type { ChatAdapter } from "../types.js";
 
 export class GeminiAdapter implements ChatAdapter {
-  private client: Promise<import("@google/generative-ai").GoogleGenerativeAI>;
+  private client: Promise<import("@google/genai").GoogleGenAI>;
 
   constructor(private apiKey: string) {
     this.client = this.initClient();
@@ -16,11 +16,11 @@ export class GeminiAdapter implements ChatAdapter {
 
   private async initClient() {
     try {
-      const { GoogleGenerativeAI } = await import("@google/generative-ai");
-      return new GoogleGenerativeAI(this.apiKey);
+      const { GoogleGenAI } = await import("@google/genai");
+      return new GoogleGenAI({ apiKey: this.apiKey });
     } catch (error: unknown) {
       throw new AnyAIProviderError(
-        "Failed to load @google/generative-ai. Install it with: npm install @google/generative-ai",
+        "Failed to load @google/genai. Install it with: npm install @google/genai",
         "gemini",
         error,
       );
@@ -30,27 +30,25 @@ export class GeminiAdapter implements ChatAdapter {
   async send(messages: ChatMessage[], model: string): Promise<ChatResponse> {
     try {
       const client = await this.client;
-      const genModel = client.getGenerativeModel({ model });
 
-      const history = messages.slice(0, -1).map((m) => ({
+      const contents = messages.map((m) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],
       }));
 
-      const lastMessage = messages[messages.length - 1];
-      if (!lastMessage) {
-        throw new AnyAIProviderError("No messages provided.", "gemini");
-      }
+      const result = await client.models.generateContent({
+        model,
+        contents,
+      });
 
-      const chat = genModel.startChat({ history });
-      const result = await chat.sendMessage(lastMessage.content);
-
-      const usage = result.response.usageMetadata;
+      const responseText =
+        result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const usage = result?.usageMetadata;
 
       return {
         message: {
-          role: "assistant" as const,
-          content: result.response.text(),
+          role: "assistant",
+          content: responseText,
         },
         usage: usage
           ? {
@@ -76,29 +74,25 @@ export class GeminiAdapter implements ChatAdapter {
   ): AsyncIterable<ChatStreamChunk> {
     try {
       const client = await this.client;
-      const genModel = client.getGenerativeModel({ model });
 
-      const history = messages.slice(0, -1).map((m) => ({
+      const contents = messages.map((m) => ({
         role: m.role === "assistant" ? "model" : "user",
         parts: [{ text: m.content }],
       }));
 
-      const lastMessage = messages[messages.length - 1];
-      if (!lastMessage) {
-        throw new AnyAIProviderError("No messages provided.", "gemini");
-      }
+      const result = await client.models.generateContentStream({
+        model,
+        contents,
+      });
 
-      const chat = genModel.startChat({ history });
-      const result = await chat.sendMessageStream(lastMessage.content);
-
-      for await (const chunk of result.stream) {
-        const text = chunk.text();
+      for await (const chunk of result) {
+        const text = chunk.text;
         if (text) {
-          yield { type: "delta" as const, delta: text };
+          yield { type: "delta", delta: text };
         }
       }
 
-      yield { type: "done" as const };
+      yield { type: "done" };
     } catch (error: unknown) {
       if (error instanceof AnyAIProviderError) throw error;
       throw new AnyAIProviderError(

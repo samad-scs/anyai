@@ -20,6 +20,6 @@ Use the **Provider's Canonical ID** as the TypeScript type.
 2.  Locate the specific provider type (e.g., `GeminiModel`).
 3.  Add the new string literal to the union.
 4.  Run `npm test` to ensure no regression.
-5.  Update `docs/README.md` if it lists top-tier models.
+5.  Update `README.md` if it lists top-tier models.
 
 **Important**: Do not invent your own names. Use the exact string the provider SDK expects.
