@@ -2,10 +2,10 @@
   "name": "anyai",
   "version": "0.2.0",
   "description": "One API. Any AI provider.",
-  "homepage": "https://github.com/samad-ai/anyai",
+  "homepage": "https://github.com/samad-scs/anyai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/samad-ai/anyai.git"
+    "url": "git+https://github.com/samad-scs/anyai.git"
   },
   "keywords": [
     "ai",
