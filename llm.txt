@@ -1,0 +1,300 @@
+# anyai — llm.txt
+# Provider-agnostic AI runtime for Node.js
+# Version: 0.4.2 | License: MIT | Node: >=18 | Module: ESM-only
+# Repository: https://github.com/samad-scs/anyai
+
+## WHAT IS ANYAI
+
+anyai is a single npm package that unifies multiple AI providers (OpenAI, Gemini, Anthropic, Ollama) behind one stable API. You switch providers by changing configuration only — no code changes required. Provider SDKs are managed internally as optional dependencies so consumers never import them directly.
+
+## INSTALL
+
+```bash
+npm install anyai
+```
+
+No additional provider SDK packages are needed. anyai bundles them as optional dependencies and lazy-loads only the one you configure.
+
+## PUBLIC EXPORTS
+
+Everything below is importable from `"anyai"`:
+
+### Classes
+- `AI` — Main entry point. Constructed synchronously. Adapters are lazy-loaded on first capability call.
+
+### Functions
+- `getProviders()` — Returns metadata for all supported providers. Synchronous. No SDK imports. Tree-shake safe.
+
+### Types (TypeScript)
+- `AIConfig<P>` — Configuration object. Generic over `ProviderName`.
+- `ProviderName` — Union: `"gemini" | "openai" | "anthropic" | "ollama"`
+- `ProviderModelMap` — Maps each `ProviderName` to its allowed model string union.
+- `GeminiModel` — Allowed Gemini model strings.
+- `OpenAIModel` — Allowed OpenAI model strings.
+- `AnthropicModel` — Allowed Anthropic model strings.
+- `OllamaModel` — `string` (accepts any model name).
+- `ChatMessage` — `{ role: ChatRole; content: string }`
+- `ChatRole` — `"system" | "user" | "assistant"`
+- `ChatResponse` — `{ message: ChatMessage; usage?: { inputTokens?; outputTokens?; totalTokens? } }`
+- `ChatStreamChunk` — `{ type: "delta"; delta: string } | { type: "done" }`
+- `ProviderMetadata` — `{ provider: ProviderName; apiKeyReq: boolean; baseUrl: boolean; models: readonly string[] }`
+
+### Error Classes
+- `AnyAIError` — Base error. Has `.code` property.
+- `AnyAIProviderError` — Provider-specific failure. Has `.provider` and `.cause`.
+- `AnyAIConfigError` — Invalid configuration.
+- `AnyAIUnsupportedError` — Unsupported feature. Has `.feature`.
+
+### Error Codes (AnyAIErrorCode)
+- `PROVIDER_ERROR`, `CONFIG_ERROR`, `UNSUPPORTED`, `RATE_LIMIT`, `AUTH_ERROR`, `NETWORK_ERROR`
+
+### Model Constants (readonly arrays)
+- `GEMINI_MODELS` — `["gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-2.5-pro", "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3-flash-preview", "gemini-3-pro-preview"]`
+- `OPENAI_MODELS` — `["gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4o", "gpt-4o-mini", "gpt-5", "gpt-5.2"]`
+- `ANTHROPIC_MODELS` — `["claude-haiku-4-5-20251001", "claude-sonnet-4-5", "claude-opus-4-6"]`
+- `OLLAMA_MODELS` — `["llama3"]`
+
+---
+
+## HOW TO INTEGRATE
+
+### Step 1 — Import
+
+```ts
+import { AI } from "anyai";
+```
+
+### Step 2 — Configure and Construct (Synchronous)
+
+The `AI` constructor is synchronous. No `await` needed. Provide `provider`, `model`, and `apiKey`.
+
+```ts
+const ai = new AI({
+  provider: "gemini",
+  apiKey: process.env.GEMINI_API_KEY!,
+  model: "gemini-2.0-flash",
+});
+```
+
+#### Configuration Shape per Provider
+
+For `"gemini"`, `"openai"`, `"anthropic"`:
+```ts
+{
+  provider: "gemini" | "openai" | "anthropic",
+  apiKey: string,          // REQUIRED
+  model: ProviderModel,    // type-safe, autocompletes to valid models
+  baseURL?: string,        // optional override
+}
+```
+
+For `"ollama"`:
+```ts
+{
+  provider: "ollama",
+  model: string,             // any model name installed on Ollama server
+  apiKey?: string,           // OPTIONAL (Ollama does not require one)
+  baseURL?: string,          // defaults to "http://localhost:11434"
+}
+```
+
+### Step 3 — Use Capabilities
+
+#### Send (non-streaming)
+
+```ts
+const response = await ai.chat.send({
+  messages: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Hello!" },
+  ],
+});
+
+console.log(response.message.content); // assistant reply string
+console.log(response.usage);           // { inputTokens, outputTokens, totalTokens } | undefined
+```
+
+#### Stream
+
+```ts
+const stream = ai.chat.stream({
+  messages: [{ role: "user", content: "Tell me a story" }],
+});
+
+for await (const chunk of stream) {
+  if (chunk.type === "delta") {
+    process.stdout.write(chunk.delta); // partial text
+  }
+  // chunk.type === "done" signals end of stream
+}
+```
+
+### Step 4 — Handle Errors
+
+```ts
+import { AnyAIProviderError, AnyAIConfigError } from "anyai";
+
+try {
+  const res = await ai.chat.send({ messages: [{ role: "user", content: "Hi" }] });
+} catch (error) {
+  if (error instanceof AnyAIConfigError) {
+    // bad configuration (wrong provider name, missing apiKey, etc.)
+    console.error("Config error:", error.message);
+  }
+  if (error instanceof AnyAIProviderError) {
+    // provider SDK threw (rate limit, auth failure, network, etc.)
+    console.error(`Provider "${error.provider}" failed:`, error.message);
+    console.error("Cause:", error.cause);
+  }
+}
+```
+
+---
+
+## HOW TO USE getProviders()
+
+`getProviders()` returns a readonly array of `ProviderMetadata` objects describing every supported provider. It is synchronous, imports no SDKs, and is safe for tree-shaking.
+
+### Import
+
+```ts
+import { getProviders } from "anyai";
+```
+
+### Call
+
+```ts
+const providers = getProviders();
+```
+
+### Return Value
+
+```ts
+// Type: readonly ProviderMetadata[]
+// Shape of each element:
+{
+  provider: ProviderName,      // "anthropic" | "gemini" | "ollama" | "openai"
+  apiKeyReq: boolean,          // true if provider requires an API key
+  baseUrl: boolean,            // true if provider uses a custom base URL (e.g. Ollama)
+  models: readonly string[],   // array of supported model identifiers
+}
+```
+
+### Example Output
+
+```ts
+[
+  { provider: "anthropic", apiKeyReq: true,  baseUrl: false, models: ["claude-haiku-4-5-20251001", "claude-sonnet-4-5", "claude-opus-4-6"] },
+  { provider: "gemini",    apiKeyReq: true,  baseUrl: false, models: ["gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-2.5-pro", "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3-flash-preview", "gemini-3-pro-preview"] },
+  { provider: "ollama",    apiKeyReq: false, baseUrl: true,  models: ["llama3"] },
+  { provider: "openai",    apiKeyReq: true,  baseUrl: false, models: ["gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4o", "gpt-4o-mini", "gpt-5", "gpt-5.2"] },
+]
+```
+
+### Use Cases
+
+#### 1. Build a dynamic provider selection UI
+
+```ts
+import { getProviders } from "anyai";
+
+const providers = getProviders();
+
+providers.forEach((p) => {
+  console.log(`Provider: ${p.provider}`);
+  console.log(`  Requires API key: ${p.apiKeyReq}`);
+  console.log(`  Custom base URL: ${p.baseUrl}`);
+  console.log(`  Models: ${p.models.join(", ")}`);
+});
+```
+
+#### 2. Validate user input before constructing AI
+
+```ts
+import { AI, getProviders } from "anyai";
+
+function createAI(providerName: string, modelName: string, apiKey: string) {
+  const providers = getProviders();
+  const match = providers.find((p) => p.provider === providerName);
+
+  if (!match) throw new Error(`Unknown provider: ${providerName}`);
+  if (!match.models.includes(modelName)) throw new Error(`Model "${modelName}" not available for ${providerName}`);
+  if (match.apiKeyReq && !apiKey) throw new Error(`API key required for ${providerName}`);
+
+  return new AI({ provider: providerName as any, model: modelName as any, apiKey });
+}
+```
+
+#### 3. Select provider and model dynamically at runtime
+
+```ts
+import { AI, getProviders } from "anyai";
+
+const providers = getProviders();
+const selected = providers.find((p) => p.provider === "gemini")!;
+
+const ai = new AI({
+  provider: selected.provider,
+  model: selected.models[0] as any,
+  apiKey: process.env.GEMINI_API_KEY!,
+});
+```
+
+---
+
+## SWITCHING PROVIDERS
+
+To switch from one provider to another, change only the configuration object:
+
+```ts
+// Before: Gemini
+const ai = new AI({ provider: "gemini", model: "gemini-2.0-flash", apiKey: GEMINI_KEY });
+
+// After: OpenAI — same capability API, different config
+const ai = new AI({ provider: "openai", model: "gpt-4o", apiKey: OPENAI_KEY });
+```
+
+All downstream code (`ai.chat.send(...)`, `ai.chat.stream(...)`) remains identical.
+
+---
+
+## ARCHITECTURE NOTES FOR AI AGENTS
+
+1. **ESM-only** — The package uses `"type": "module"`. Only ESM imports work.
+2. **Tree-shakeable** — Each provider adapter is behind a dynamic `import()`. Your bundle only includes the provider you use.
+3. **Lazy adapter loading** — The `AI` constructor is synchronous. The provider SDK is loaded on the first `ai.chat.send()` or `ai.chat.stream()` call.
+4. **No direct SDK access** — Provider SDKs (`@google/genai`, `openai`, `@anthropic-ai/sdk`) are internal. Never import them directly.
+5. **Type-safe model selection** — When `provider` is set, TypeScript constrains `model` to only valid models for that provider.
+6. **Normalized responses** — All providers return the same `ChatResponse` and `ChatStreamChunk` shapes regardless of underlying SDK differences.
+7. **Ollama special case** — `apiKey` is optional for Ollama. `baseURL` points to a local Ollama server (default: `http://localhost:11434`).
+
+---
+
+## FULL MINIMAL EXAMPLE
+
+```ts
+import { AI, getProviders, AnyAIProviderError } from "anyai";
+
+// Discover available providers
+const providers = getProviders();
+console.log("Available:", providers.map((p) => p.provider));
+
+// Initialize
+const ai = new AI({
+  provider: "openai",
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: "gpt-4o",
+});
+
+// Chat
+try {
+  const res = await ai.chat.send({
+    messages: [{ role: "user", content: "What is 2+2?" }],
+  });
+  console.log(res.message.content);
+} catch (err) {
+  if (err instanceof AnyAIProviderError) {
+    console.error(`${err.provider} error: ${err.message}`);
+  }
+}
+```
