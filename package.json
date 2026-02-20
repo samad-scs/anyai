@@ -34,6 +34,7 @@
     "README.md",
     "LICENSE"
   ],
+  "prepublishOnly": "npm run build",
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
