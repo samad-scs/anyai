@@ -3,26 +3,33 @@ import { AI } from "../../src/index.js";
 import { ChatCapability } from "../../src/capabilities/chat.js";
 
 describe("AI Contract", () => {
-  it("should expose chat capability", async () => {
-    expect(AI).toBeDefined();
-    expect(AI.create).toBeDefined();
+  it("should expose chat capability synchronously", () => {
+    const ai = new AI({
+      provider: "ollama",
+      model: "llama3",
+    });
+
+    expect(ai).toBeDefined();
+    expect(ai.chat).toBeDefined();
+    expect(ai.chat).toBeInstanceOf(ChatCapability);
   });
 
-  it("should fail for invalid provider", async () => {
+  it("should fail for invalid provider on first send()", async () => {
+    const ai = new AI({
+      provider: "invalid" as any,
+      apiKey: "test",
+      model: "gpt-4o",
+    });
+
+    // Error is deferred to first capability use
     await expect(
-      AI.create({
-        provider: "invalid" as any,
-        apiKey: "test",
-        model: "gpt-4o",
-      }),
+      ai.chat.send({ messages: [{ role: "user", content: "hello" }] }),
     ).rejects.toThrow();
   });
 });
 
 describe("Chat Capability", () => {
   it("should have send and stream methods", () => {
-    // We use a cast here because we don't want to create a full mock adapter for this simple check
-    // and we are just checking the class definition prototype or instantiation
     const mockAdapter = {
       send: () =>
         Promise.resolve({
@@ -31,7 +38,7 @@ describe("Chat Capability", () => {
       stream: () => (async function* () {})(),
     } as any;
 
-    const chat = new ChatCapability(mockAdapter, "model");
+    const chat = new ChatCapability(() => Promise.resolve(mockAdapter), "model");
     expect(chat.send).toBeDefined();
     expect(chat.stream).toBeDefined();
   });

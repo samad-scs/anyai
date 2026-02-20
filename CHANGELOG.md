@@ -3,6 +3,13 @@
 All notable changes to this project are documented here.
 This project follows Semantic Versioning.
 
+## [0.4.0] – 2026-02-21
+
+### Changed
+
+- AI initialization is now synchronous (no await required)
+- Provider adapters are lazily resolved on first capability execution
+
 ## [0.3.0] – 2026-02-21
 
 ### Added

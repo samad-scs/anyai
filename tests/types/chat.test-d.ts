@@ -16,10 +16,10 @@ import type {
 
 import { AI } from "../../src/ai.js";
 
-// ─── AI.create with valid Gemini config ──────────────────────────────────────
+// ─── new AI() with valid Gemini config ───────────────────────────────────────
 
-async function testGeminiConfig() {
-  const ai = await AI.create({
+function testGeminiConfig() {
+  const ai = new AI({
     provider: "gemini",
     apiKey: "test-key",
     model: "gemini-2.5-pro",
@@ -39,10 +39,10 @@ async function testGeminiConfig() {
   });
 }
 
-// ─── AI.create with valid OpenAI config ──────────────────────────────────────
+// ─── new AI() with valid OpenAI config ───────────────────────────────────────
 
-async function testOpenAIConfig() {
-  const ai = await AI.create({
+function testOpenAIConfig() {
+  const ai = new AI({
     provider: "openai",
     apiKey: "test-key",
     model: "gpt-4o",
@@ -51,18 +51,18 @@ async function testOpenAIConfig() {
 
 // ─── Invalid configs should fail ─────────────────────────────────────────────
 
-async function testInvalidConfigs() {
+function testInvalidConfigs() {
   // @ts-expect-error — missing required fields
-  await AI.create({});
+  new AI({});
 
-  await AI.create({
+  new AI({
     // @ts-expect-error — invalid provider name
     provider: "invalid-provider",
     apiKey: "test-key",
     model: "gpt-4o",
   });
 
-  await AI.create({
+  new AI({
     provider: "gemini",
     apiKey: "test-key",
     // @ts-expect-error — mismatched provider/model combination
@@ -70,7 +70,7 @@ async function testInvalidConfigs() {
   });
 
   // @ts-expect-error — missing apiKey
-  await AI.create({
+  new AI({
     provider: "gemini",
     model: "gemini-2.5-pro",
   });
@@ -78,8 +78,8 @@ async function testInvalidConfigs() {
 
 // ─── Invalid send input should fail ──────────────────────────────────────────
 
-async function testInvalidSendInput() {
-  const ai = await AI.create({
+function testInvalidSendInput() {
+  const ai = new AI({
     provider: "gemini",
     apiKey: "test-key",
     model: "gemini-2.5-pro",

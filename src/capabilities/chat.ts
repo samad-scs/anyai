@@ -8,15 +8,19 @@ import type { ChatAdapter } from "../providers/types.js";
 
 export class ChatCapability {
   constructor(
-    private adapter: ChatAdapter,
+    private getAdapter: () => Promise<ChatAdapter>,
     private model: string,
   ) {}
 
-  send(input: { messages: ChatMessage[] }): Promise<ChatResponse> {
-    return this.adapter.send(input.messages, this.model);
+  async send(input: { messages: ChatMessage[] }): Promise<ChatResponse> {
+    const adapter = await this.getAdapter();
+    return adapter.send(input.messages, this.model);
   }
 
-  stream(input: { messages: ChatMessage[] }): AsyncIterable<ChatStreamChunk> {
-    return this.adapter.stream(input.messages, this.model);
+  async *stream(
+    input: { messages: ChatMessage[] },
+  ): AsyncIterable<ChatStreamChunk> {
+    const adapter = await this.getAdapter();
+    yield* adapter.stream(input.messages, this.model);
   }
 }

@@ -9,20 +9,22 @@ import { ChatCapability } from "./capabilities/chat.js";
 export class AI<P extends ProviderName = ProviderName> {
   public readonly chat: ChatCapability;
 
-  private constructor(adapter: ChatAdapter, model: string) {
-    this.chat = new ChatCapability(adapter, model);
+  private adapterPromise?: Promise<ChatAdapter>;
+  private readonly config: AIConfig<P>;
+
+  constructor(config: AIConfig<P>) {
+    this.config = config;
+    this.chat = new ChatCapability(() => this.getAdapter(), config.model);
   }
 
-  static async create<P extends ProviderName>(
-    config: AIConfig<P>,
-  ): Promise<AI<P>> {
-    const adapter = await AI.loadAdapter(config);
-    return new AI<P>(adapter, config.model);
+  private getAdapter(): Promise<ChatAdapter> {
+    if (this.adapterPromise) return this.adapterPromise;
+
+    this.adapterPromise = this.loadAdapter();
+    return this.adapterPromise;
   }
 
-  private static async loadAdapter<P extends ProviderName>(
-    config: AIConfig<P>,
-  ): Promise<ChatAdapter> {
+  private async loadAdapter(): Promise<ChatAdapter> {
     // ** Provider Registry for Lazy Loading
     // Each loader returns a factory that creates a ChatAdapter from config.
     const providerLoaders: Record<
@@ -49,13 +51,15 @@ export class AI<P extends ProviderName = ProviderName> {
       },
     };
 
-    const loader = providerLoaders[config.provider];
+    const loader = providerLoaders[this.config.provider];
 
     if (!loader) {
-      throw new AnyAIConfigError(`Unsupported provider: ${config.provider}`);
+      throw new AnyAIConfigError(
+        `Unsupported provider: ${this.config.provider}`,
+      );
     }
 
     const factory = await loader();
-    return factory(config);
+    return factory(this.config);
   }
 }

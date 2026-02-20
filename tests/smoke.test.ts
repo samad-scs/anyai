@@ -6,13 +6,15 @@ describe("anyai smoke test", () => {
     expect(AI).toBeDefined();
   });
 
-  it("should throw on invalid provider", async () => {
+  it("should throw on invalid provider on first send()", async () => {
+    const ai = new AI({
+      provider: "invalid" as any,
+      apiKey: "test",
+      model: "gpt-4o",
+    });
+
     await expect(
-      AI.create({
-        provider: "invalid" as any,
-        apiKey: "test",
-        model: "gpt-4o",
-      }),
+      ai.chat.send({ messages: [{ role: "user", content: "hello" }] }),
     ).rejects.toThrow(/Unsupported provider/);
   });
 });

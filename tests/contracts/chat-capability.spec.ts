@@ -42,12 +42,16 @@ function createMockAdapter(): ChatAdapter {
   };
 }
 
+function createLazyGetter(adapter: ChatAdapter): () => Promise<ChatAdapter> {
+  return () => Promise.resolve(adapter);
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("ChatCapability", () => {
   it("send() delegates to adapter with correct arguments", async () => {
     const adapter = createMockAdapter();
-    const capability = new ChatCapability(adapter, "test-model");
+    const capability = new ChatCapability(createLazyGetter(adapter), "test-model");
 
     const messages: ChatMessage[] = [{ role: "user", content: "hello" }];
     const result = await capability.send({ messages });
@@ -59,7 +63,7 @@ describe("ChatCapability", () => {
 
   it("send() passes the configured model to adapter", async () => {
     const adapter = createMockAdapter();
-    const capability = new ChatCapability(adapter, "gemini-2.5-pro");
+    const capability = new ChatCapability(createLazyGetter(adapter), "gemini-2.5-pro");
 
     await capability.send({
       messages: [{ role: "user", content: "test" }],
@@ -73,7 +77,7 @@ describe("ChatCapability", () => {
 
   it("stream() delegates to adapter and returns AsyncIterable", async () => {
     const adapter = createMockAdapter();
-    const capability = new ChatCapability(adapter, "test-model");
+    const capability = new ChatCapability(createLazyGetter(adapter), "test-model");
 
     const messages: ChatMessage[] = [{ role: "user", content: "hello" }];
     const chunks: ChatStreamChunk[] = [];
@@ -95,7 +99,7 @@ describe("ChatCapability", () => {
 
   it("send() returns ChatResponse with usage when adapter provides it", async () => {
     const adapter = createMockAdapter();
-    const capability = new ChatCapability(adapter, "test-model");
+    const capability = new ChatCapability(createLazyGetter(adapter), "test-model");
 
     const result = await capability.send({
       messages: [{ role: "user", content: "hello" }],
