@@ -20,3 +20,5 @@ export {
   AnyAIProviderError,
   AnyAIUnsupportedError,
 } from "./core/errors.js";
+export { getProviders } from "./providers/registry.js";
+export type { ProviderMetadata } from "./providers/registry.js";

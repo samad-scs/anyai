@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 This project follows Semantic Versioning.
 
+## [0.4.1] – 2026-02-21
+
+### Added
+
+- `getProviders()` public API for listing supported providers and models
+
 ## [0.4.0] – 2026-02-21
 
 ### Changed

@@ -45,4 +45,15 @@ describe("Dependency isolation", () => {
     // This is a types-only module, import should not throw
     expect(providerTypes).toBeDefined();
   });
+
+  it("provider registry can be imported without provider SDKs", async () => {
+    const registry = await import("../../src/providers/registry.js");
+
+    expect(registry.getProviders).toBeDefined();
+    expect(typeof registry.getProviders).toBe("function");
+
+    const providers = registry.getProviders();
+    expect(Array.isArray(providers)).toBe(true);
+    expect(providers.length).toBeGreaterThan(0);
+  });
 });
