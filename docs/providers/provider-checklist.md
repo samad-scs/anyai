@@ -23,4 +23,5 @@ Copy this into your Pull Request description when adding a new provider.
 
 - [ ] **Documentation**
   - [ ] Added to `Supported Providers` table in `README.md`.
-  - [ ] Added model type definition in `src/core/types.ts` (if applicable).
+  - [ ] Added model constant array in `src/core/types.ts`.
+  - [ ] Added registry entry in `src/providers/registry.ts`.

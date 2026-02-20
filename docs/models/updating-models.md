@@ -9,17 +9,19 @@ This guide covers how to add or update models in the `anyai` registry.
 
 ## Naming Conventions
 
-Use the **Provider's Canonical ID** as the TypeScript type.
+Use the **Provider's Canonical ID** as the model string.
 
 - **OpenAI**: Use the specific aliases like `gpt-4o`. Avoid dated versions (`gpt-4o-2024-05-13`) unless there is a specific reason to expose them.
-- **Gemini**: Use the unstable/versioned names only if they are the primary intended way to access the model (`gemini-1.5-flash`).
+- **Gemini**: Use the unstable/versioned names only if they are the primary intended way to access the model (`gemini-2.5-flash`).
 
 ## Steps to Add a Model
 
 1.  Open `src/core/types.ts`.
-2.  Locate the specific provider type (e.g., `GeminiModel`).
-3.  Add the new string literal to the union.
-4.  Run `npm test` to ensure no regression.
+2.  Locate the provider's model constant array (e.g., `GEMINI_MODELS`).
+3.  Add the new string to the array.
+4.  Run `pnpm test` to ensure no regression.
 5.  Update `README.md` if it lists top-tier models.
+
+The type union (e.g., `GeminiModel`) and the `getProviders()` registry both derive from the same array automatically — no need to update them separately.
 
 **Important**: Do not invent your own names. Use the exact string the provider SDK expects.

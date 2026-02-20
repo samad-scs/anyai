@@ -4,18 +4,33 @@
 
 ## What is the Model Registry?
 
-The model registry is a set of TypeScript string unions defined in `src/core/types.ts`. It maps provider-specific model IDs to the `ProviderName` they belong to.
+The model registry is a set of `as const` arrays defined in `src/core/types.ts`. Each array is the **single source of truth** for a provider's supported models. TypeScript types are derived from these arrays automatically.
 
 ```ts
-export type OpenAIModel = "gpt-4o" | "gpt-4-turbo" | ...;
-export type GeminiModel = "gemini-1.5-pro" | "gemini-1.5-flash" | ...;
+export const OPENAI_MODELS = [
+  "gpt-4.1",
+  "gpt-4o",
+  // ...
+] as const
+
+export type OpenAIModel = (typeof OPENAI_MODELS)[number]
+```
+
+The same arrays are used by the `getProviders()` API to expose runtime metadata:
+
+```ts
+import { getProviders } from "anyai"
+
+const providers = getProviders()
+// Each entry includes: provider, apiKeyReq, baseUrl, models
 ```
 
 ## Why Normalized Models?
 
 1.  **Type Safety**: Your IDE can autocomplete available models for the selected provider.
-2.  **Validation**: `anyai` can reject invalid model names at runtime.
-3.  **Consistency**: We ensure users use the canonical IDs (e.g., `gpt-4o` vs `gpt-4o-2024-05-13`) where appropriate.
+2.  **Single Source of Truth**: Model names are defined once — types and runtime metadata both derive from the same constant.
+3.  **Validation**: `anyai` can reject invalid model names at runtime.
+4.  **Consistency**: We ensure users use the canonical IDs (e.g., `gpt-4o` vs `gpt-4o-2024-05-13`) where appropriate.
 
 ## Stability Guarantees
 

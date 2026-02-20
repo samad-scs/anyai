@@ -36,6 +36,9 @@ Chat:
 - Streaming responses (async iterator)
 - Unified message and usage formats
 
+Provider Discovery:
+- `getProviders()` for static metadata about supported providers and models
+
 Out of scope:
 - tools / functions
 - multimodal

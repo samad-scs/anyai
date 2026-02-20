@@ -86,6 +86,23 @@ for await (const chunk of stream) {
 | Ollama    | Available | Chat, Streaming |
 | OpenAI    | Available | Chat, Streaming |
 
+## Provider Discovery
+
+List all supported providers and their models at runtime — no async, no SDK imports:
+
+```ts
+import { getProviders } from 'anyai'
+
+const providers = getProviders()
+
+// [
+//   { provider: "anthropic", apiKeyReq: true,  baseUrl: false, models: ["claude-sonnet-4-5", ...] },
+//   { provider: "gemini",    apiKeyReq: true,  baseUrl: false, models: ["gemini-2.5-pro", ...] },
+//   { provider: "ollama",    apiKeyReq: false, baseUrl: true,  models: ["llama3"] },
+//   { provider: "openai",    apiKeyReq: true,  baseUrl: false, models: ["gpt-4o", ...] },
+// ]
+```
+
 ## Error Handling
 
 Standardized error types across all providers:

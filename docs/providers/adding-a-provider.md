@@ -94,8 +94,20 @@ try {
 
 ## 6. Registration
 
-1.  Add the provider name to `ProviderName` in `src/core/types.ts`.
-2.  Add the loader to `src/ai.ts` in the `providerLoaders` object.
+1.  Add the provider's model constant array and type to `src/core/types.ts`:
+
+```ts
+export const ANTHROPIC_MODELS = [
+  "claude-haiku-4-5-20251001",
+  "claude-sonnet-4-5",
+  "claude-opus-4-6",
+] as const
+
+export type AnthropicModel = (typeof ANTHROPIC_MODELS)[number]
+```
+
+2.  Add the provider to `ProviderModelMap` in `src/core/types.ts`.
+3.  Add the loader to `src/ai.ts` in the `providerLoaders` object.
 
 ```ts
 anthropic: async () => {
@@ -104,5 +116,16 @@ anthropic: async () => {
 },
 ```
 
-3.  Add the SDK to `optionalDependencies` in `package.json`.
-4.  Update the root `README.md` file to include the new provider in the "Supported Providers" table. Follow the `provider-listing` skill instructions.
+4.  Add a registry entry in `src/providers/registry.ts`:
+
+```ts
+{
+  provider: "anthropic",
+  apiKeyReq: true,
+  baseUrl: false,
+  models: ANTHROPIC_MODELS,
+},
+```
+
+5.  Add the SDK to `optionalDependencies` in `package.json`.
+6.  Update the root `README.md` file to include the new provider in the "Supported Providers" table. Follow the `provider-listing` skill instructions.
