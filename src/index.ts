@@ -1,5 +1,5 @@
 // ** Application Service, Constants, and Type Imports
-export { AI } from "./ai.js";
+export { AI } from './ai.js'
 export type {
   AIConfig,
   AnthropicModel,
@@ -12,13 +12,19 @@ export type {
   OpenAIModel,
   ProviderModelMap,
   ProviderName,
-} from "./core/types.js";
+} from './core/types.js'
+export {
+  ANTHROPIC_MODELS,
+  GEMINI_MODELS,
+  OLLAMA_MODELS,
+  OPENAI_MODELS,
+} from './core/types.js'
 export {
   AnyAIConfigError,
   AnyAIError,
   AnyAIErrorCode,
   AnyAIProviderError,
   AnyAIUnsupportedError,
-} from "./core/errors.js";
-export { getProviders } from "./providers/registry.js";
-export type { ProviderMetadata } from "./providers/registry.js";
+} from './core/errors.js'
+export { getProviders } from './providers/registry.js'
+export type { ProviderMetadata } from './providers/registry.js'
