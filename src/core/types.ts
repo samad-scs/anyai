@@ -23,23 +23,34 @@ export type AnthropicModel =
   | "claude-sonnet-4-5"
   | "claude-opus-4-6";
 
+export type OllamaModel = string;
+
 // ─── Provider → Model Mapping ────────────────────────────────────────────────
 
 export interface ProviderModelMap {
   gemini: GeminiModel;
   openai: OpenAIModel;
   anthropic: AnthropicModel;
+  ollama: OllamaModel;
 }
 
 export type ProviderName = keyof ProviderModelMap;
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
-export interface AIConfig<P extends ProviderName = ProviderName> {
-  provider: P;
-  apiKey: string;
-  model: ProviderModelMap[P];
-}
+export type AIConfig<P extends ProviderName = ProviderName> = P extends "ollama"
+  ? {
+      provider: P;
+      model: ProviderModelMap[P];
+      apiKey?: string | undefined;
+      baseURL?: string | undefined;
+    }
+  : {
+      provider: P;
+      model: ProviderModelMap[P];
+      apiKey: string;
+      baseURL?: string | undefined;
+    };
 
 // ─── Chat Types ──────────────────────────────────────────────────────────────
 

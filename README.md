@@ -81,9 +81,10 @@ for await (const chunk of stream) {
 
 | Provider  | Status    | Capabilities    |
 | --------- | --------- | --------------- |
-| Gemini    | Available | Chat, Streaming |
-| OpenAI    | Available | Chat, Streaming |
 | Anthropic | Available | Chat, Streaming |
+| Gemini    | Available | Chat, Streaming |
+| Ollama    | Available | Chat, Streaming |
+| OpenAI    | Available | Chat, Streaming |
 
 ## Error Handling
 

@@ -12,6 +12,7 @@ import type {
   AIConfig,
   AnthropicModel,
   GeminiModel,
+  OllamaModel,
   OpenAIModel,
   ProviderModelMap,
   ProviderName,
@@ -23,6 +24,7 @@ function testProviderName() {
   const gemini: ProviderName = "gemini";
   const openai: ProviderName = "openai";
   const anthropic: ProviderName = "anthropic";
+  const ollama: ProviderName = "ollama";
 
   // @ts-expect-error — unknown provider
   const unknown: ProviderName = "mistral";
@@ -34,6 +36,7 @@ function testProviderModelMap() {
   const geminiModel: ProviderModelMap["gemini"] = "gemini-2.5-pro";
   const openaiModel: ProviderModelMap["openai"] = "gpt-4o";
   const anthropicModel: ProviderModelMap["anthropic"] = "claude-sonnet-4-5";
+  const ollamaModel: ProviderModelMap["ollama"] = "llama3";
 
   // @ts-expect-error — wrong model for gemini
   const badGemini: ProviderModelMap["gemini"] = "gpt-4o";
@@ -59,6 +62,11 @@ function testModelEnums() {
   // Anthropic models
   const a1: AnthropicModel = "claude-sonnet-4-5";
   const a2: AnthropicModel = "claude-haiku-4-5-20251001";
+
+  // Ollama models — accepts any string
+  const ol1: OllamaModel = "llama3";
+  const ol2: OllamaModel = "mistral";
+  const ol3: OllamaModel = "codellama";
 
   // @ts-expect-error — nonexistent model
   const bad: GeminiModel = "gemini-99";
@@ -97,5 +105,24 @@ function testAIConfig() {
   const noModel: AIConfig<"openai"> = {
     provider: "openai",
     apiKey: "key",
+  };
+
+  // ─── Ollama config — apiKey is NOT required ──────────────────────────────
+
+  const ollamaMinimal: AIConfig<"ollama"> = {
+    provider: "ollama",
+    model: "llama3",
+  };
+
+  const ollamaWithBaseURL: AIConfig<"ollama"> = {
+    provider: "ollama",
+    model: "llama3",
+    baseURL: "http://custom:8080",
+  };
+
+  const ollamaWithApiKey: AIConfig<"ollama"> = {
+    provider: "ollama",
+    model: "llama3",
+    apiKey: "optional-key",
   };
 }

@@ -47,4 +47,19 @@ describe("Provider lazy loading", () => {
       // We only care that it attempted to load gemini, not openai
     }
   });
+
+  it("AI.create with ollama loads without any SDK", async () => {
+    const { AI } = await import("../../src/ai.js");
+
+    // Ollama uses raw fetch — no SDK required.
+    // This will try to connect to localhost:11434 but the adapter
+    // should load without error.
+    const ai = await AI.create({
+      provider: "ollama",
+      model: "llama3",
+    });
+
+    expect(ai).toBeDefined();
+    expect(ai.chat).toBeDefined();
+  });
 });

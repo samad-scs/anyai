@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 This project follows Semantic Versioning.
 
+## [0.3.0] – 2026-02-21
+
+### Added
+
+- Ollama provider (local runtime, no API key required).
+
 ## [0.2.0] – 2026-02-10
 
 ### Added

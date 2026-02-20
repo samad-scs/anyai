@@ -24,22 +24,28 @@ export class AI<P extends ProviderName = ProviderName> {
     config: AIConfig<P>,
   ): Promise<ChatAdapter> {
     // ** Provider Registry for Lazy Loading
+    // Each loader returns a factory that creates a ChatAdapter from config.
     const providerLoaders: Record<
       ProviderName,
-      () => Promise<new (apiKey: string) => ChatAdapter>
+      () => Promise<(config: AIConfig<any>) => ChatAdapter>
     > = {
       gemini: async () => {
         const { GeminiAdapter } = await import("./providers/gemini/adapter.js");
-        return GeminiAdapter;
+        return (cfg) => new GeminiAdapter(cfg.apiKey as string);
       },
       openai: async () => {
         const { OpenAIAdapter } = await import("./providers/openai/adapter.js");
-        return OpenAIAdapter;
+        return (cfg) => new OpenAIAdapter(cfg.apiKey as string);
       },
       anthropic: async () => {
         const { AnthropicAdapter } =
           await import("./providers/anthropic/adapter.js");
-        return AnthropicAdapter;
+        return (cfg) => new AnthropicAdapter(cfg.apiKey as string);
+      },
+      ollama: async () => {
+        const { OllamaAdapter } =
+          await import("./providers/ollama/adapter.js");
+        return (cfg) => new OllamaAdapter(cfg.baseURL);
       },
     };
 
@@ -49,7 +55,7 @@ export class AI<P extends ProviderName = ProviderName> {
       throw new AnyAIConfigError(`Unsupported provider: ${config.provider}`);
     }
 
-    const AdapterClass = await loader();
-    return new AdapterClass(config.apiKey);
+    const factory = await loader();
+    return factory(config);
   }
 }

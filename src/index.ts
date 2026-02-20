@@ -8,6 +8,7 @@ export type {
   ChatRole,
   ChatStreamChunk,
   GeminiModel,
+  OllamaModel,
   OpenAIModel,
   ProviderModelMap,
   ProviderName,
