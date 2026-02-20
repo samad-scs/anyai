@@ -21,19 +21,19 @@ If you only use Gemini, the OpenAI and Anthropic logic will be automatically exc
 ## Quick Start
 
 ```ts
-import { AI } from "anyai";
+import { AI } from 'anyai'
 
-const ai = await AI.create({
-  provider: "gemini",
+const ai = new AI({
+  provider: 'gemini',
   apiKey: process.env.GEMINI_API_KEY!,
-  model: "gemini-2.0-flash", // Fully type-safe, autocompletes Gemini models
-});
+  model: 'gemini-2.0-flash', // Fully type-safe, autocompletes Gemini models
+})
 
 const response = await ai.chat.send({
-  messages: [{ role: "user", content: "Hello!" }],
-});
+  messages: [{ role: 'user', content: 'Hello!' }],
+})
 
-console.log(response.message.content);
+console.log(response.message.content)
 ```
 
 ## Type-Safe Provider Models
@@ -42,37 +42,37 @@ When you set the `provider`, the `model` field is strictly constrained to that p
 
 ```ts
 // Valid: only Gemini models are suggested and allowed
-await AI.create({
-  provider: "gemini",
-  model: "gemini-2.0-flash",
-  apiKey: "...",
-});
+new AI({
+  provider: 'gemini',
+  model: 'gemini-2.0-flash',
+  apiKey: '...',
+})
 
 // Valid: only OpenAI models are suggested and allowed
-await AI.create({
-  provider: "openai",
-  model: "gpt-4o",
-  apiKey: "...",
-});
+new AI({
+  provider: 'openai',
+  model: 'gpt-4o',
+  apiKey: '...',
+})
 
 // Error: "gpt-4o" is not a Gemini model
-await AI.create({
-  provider: "gemini",
-  model: "gpt-4o",
-  apiKey: "...",
-});
+new AI({
+  provider: 'gemini',
+  model: 'gpt-4o',
+  apiKey: '...',
+})
 ```
 
 ## Streaming
 
 ```ts
 const stream = ai.chat.stream({
-  messages: [{ role: "user", content: "Tell me a story" }],
-});
+  messages: [{ role: 'user', content: 'Tell me a story' }],
+})
 
 for await (const chunk of stream) {
-  if (chunk.type === "delta") {
-    process.stdout.write(chunk.delta);
+  if (chunk.type === 'delta') {
+    process.stdout.write(chunk.delta)
   }
 }
 ```
@@ -91,13 +91,13 @@ for await (const chunk of stream) {
 Standardized error types across all providers:
 
 ```ts
-import { AnyAIProviderError, AnyAIConfigError } from "anyai";
+import { AnyAIProviderError, AnyAIConfigError } from 'anyai'
 
 try {
-  await ai.chat.send({ messages: [{ role: "user", content: "Hello" }] });
+  await ai.chat.send({ messages: [{ role: 'user', content: 'Hello' }] })
 } catch (error) {
   if (error instanceof AnyAIProviderError) {
-    console.error(`Provider ${error.provider} failed: ${error.message}`);
+    console.error(`Provider ${error.provider} failed: ${error.message}`)
   }
 }
 ```
